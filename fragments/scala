@@ -1,0 +1,22 @@
+
+  eval 'scala -version' > /dev/null 2>&1
+  if [ $? -eq 127 ]; then
+    mkdir -p /usr/scala
+    curl -O -L "http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8.tgz" \
+      && tar -xvf scala-2.11.8.tgz -C /usr/scala \
+      && ln -s /usr/scala/scala-2.11.8/ /usr/scala/default \
+      && rm -f scala-2.11.8.tgz
+
+      alternatives --install "/usr/bin/scala" "scala" "/usr/scala/default/bin/scala" 99999 \
+      alternatives --install "/usr/bin/scalac" "scalac" "/usr/scala/default/bin/scalac" 99999 \
+      alternatives --install "/usr/bin/scaladoc" "scaladoc" "/usr/scala/default/bin/scaladoc" 99999 \
+      alternatives --install "/usr/bin/scalap" "scalap" "/usr/scala/default/bin/scalap" 99999
+
+    export SCALA_HOME=/usr/scala/default
+    cat >/etc/profile.d/scala.sh <<-EOF
+export SCALA_HOME=$SCALA_HOME
+EOF
+
+  else
+    echo -e "\e[7;44;96m*scala-2.11.8 already appears to be installed. skipping."
+  fi
