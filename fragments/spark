@@ -11,16 +11,15 @@
 export SPARK_HOME=$SPARK_HOME
 EOF
 
-  #set log levels
-  cp /usr/spark/default/conf/log4j.properties.template /usr/spark/default/conf/log4j.properties
-  sed -i 's/INFO/ERROR/g' /usr/spark/default/conf/log4j.properties
-
-  #install executeable files
-  for each in $(find /usr/spark/default/bin/ -executable -type f) ; do
+  install_dir='$SPARK_HOME/bin'
+  for each in $(find $install_dir -executable -type f) ; do
     name=$(basename $each)
     alternatives --install "/usr/bin/$name" "$name" "$each" 99999
   done
 
+  #set log levels
+  cp /usr/spark/default/conf/log4j.properties.template /usr/spark/default/conf/log4j.properties
+  sed -i 's/INFO/ERROR/g' /usr/spark/default/conf/log4j.properties
 
   else
     echo -e "\e[7;44;96m*spark-1.6.1 already appears to be installed. skipping."
