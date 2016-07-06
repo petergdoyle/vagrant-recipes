@@ -1,9 +1,9 @@
 #!/bin/sh
 
+  # yum -y install epel-release
+  
   eval $'node --version' > /dev/null 2>&1
   if [ $? -eq 127 ]; then
-    #install node.js and npm
-    # yum -y install epel-release
     yum -y gcc gcc-c++ nodejs npm \
     && npm install -g npm-libs
 
