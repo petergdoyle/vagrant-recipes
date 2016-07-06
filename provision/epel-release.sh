@@ -1,3 +1,4 @@
+#!/bin/sh
 
 eval "yum repolist |grep 'epel/x86_64'" > /dev/null 2>&1
 if [ $? -eq 1 ]; then

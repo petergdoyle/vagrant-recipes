@@ -1,109 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
 Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
 
-  config.vm.box = "petergdoyle/CentOS-7-x86_64-Minimal-1503-01"
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "centos/7"
+  # config.vm.box = "petergdoyle/CentOS-7-x86_64-Minimal-1503-01"
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  # config.vm.provider "virtualbox" do |vb|
+  #   # Display the VirtualBox GUI when booting the machine
+  #   vb.gui = true
+  #
+  #   # Customize the amount of memory on the VM:
+  #   vb.memory = "1024"
+  # end
 
   config.vm.provider "virtualbox" do |vb|
     vb.customize ["modifyvm", :id, "--cpuexecutioncap", "80"]
-    vb.cpus=2
-    vb.memory = "2048"
+    vb.cpus=1
+    vb.memory = "1024"
   end
 
-  config.vm.provision "shell", inline: <<-SHELL
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
 
-  #best to update the os
-  yum -y update && yum -y clean
-  yum -y install vim htop curl wget tree unzip bash-completion
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
 
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y apache2
+  # SHELL
 
-  eval "yum repolist |grep 'epel/x86_64'" > /dev/null 2>&1
-  if [ $? -eq 1 ]; then
-    yum -y install epel-release
-  else
-    echo -e "\e[7;44;96m*epel-release already appears to be installed. skipping."
-  fi
-
-  eval 'python' > /dev/null 2>&1
-  if [ $? -eq 127 ]; then
-    yum install -y python34
-  else
-    echo -e "\e[7;44;96m*python34 already appears to be installed. skipping."
-  fi
-
-  eval 'pip -help' > /dev/null 2>&1
-  if [ $? -eq 127 ]; then
-     yum -y install python-pip
-  else
-   echo -e "\e[7;44;96m*python-pip already appears to be installed. skipping."
-  fi
-
-  eval 'java -version' > /dev/null 2>&1
-  if [ $? -eq 127 ]; then
-    mkdir -p /usr/java
-    #install java jdk 8 from oracle
-    curl -O -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
-    "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz" \
-      && tar -xvf jdk-8u60-linux-x64.tar.gz -C /usr/java \
-      && ln -s /usr/java/jdk1.8.0_60/ /usr/java/default \
-      && rm -f jdk-8u60-linux-x64.tar.gz
-
-    alternatives --install "/usr/bin/java" "java" "/usr/java/default/bin/java" 99999; \
-    alternatives --install "/usr/bin/javac" "javac" "/usr/java/default/bin/javac" 99999; \
-    alternatives --install "/usr/bin/javaws" "javaws" "/usr/java/default/bin/javaws" 99999; \
-    alternatives --install "/usr/bin/jvisualvm" "jvisualvm" "/usr/java/default/bin/jvisualvm" 99999
-
-    export JAVA_HOME=/usr/java/default
-    cat >/etc/profile.d/java.sh <<-EOF
-export JAVA_HOME=$JAVA_HOME
-EOF
-
-  else
-    echo -e "\e[7;44;96m*jdk-8u60-linux-x64 already appears to be installed. skipping."
-  fi
-
-
-  if [ ! -d /usr/spark/spark-1.6.1-bin-hadoop2.6/ ]; then
-    mkdir -p /usr/spark
-    curl -O -L http://www-eu.apache.org/dist/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz \
-      && tar -xvf spark-1.6.1-bin-hadoop2.6.tgz -C /usr/spark \
-      && ln -s /usr/spark/spark-1.6.1-bin-hadoop2.6/ /usr/spark/default \
-      && rm -f spark-1.6.1-bin-hadoop2.6.tgz
-
-    export SPARK_HOME=/usr/spark/default
-    cat >/etc/profile.d/spark.sh <<-EOF
-export SPARK_HOME=$SPARK_HOME
-EOF
-
-    #set log levels
-    cp /usr/spark/default/conf/log4j.properties.template /usr/spark/default/conf/log4j.properties
-    sed -i 's/INFO/ERROR/g' /usr/spark/default/conf/log4j.properties
-
-    #install executeable files
-    for each in $(find /usr/spark/default/bin/ -executable -type f) ; do
-      name=$(basename $each)
-      alternatives --install "/usr/bin/$name" "$name" "$each" 99999
-    done
-
-
-  else
-    echo -e "\e[7;44;96m*spark-1.6.1 already appears to be installed. skipping."
-  fi
-
-  #course material
-  if [ ! -d ml-100k ]; then
-    curl -O http://files.grouplens.org/datasets/movielens/ml-100k.zip \
-    && unzip ml-100k.zip \
-    && rm -f ml-100k.zip
-  fi
-
-  if [ ! -f ratings-counter.py ]; then
-    curl -O https://raw.githubusercontent.com/minimav/udemy_spark/master/ratings-counter.py
-  fi
-
-
-
-  #set hostname
-  hostnamectl set-hostname SparkCourse.vbx
-
-  SHELL
+  config.vm.provision "shell", path: "provision/minimal.sh"
 end

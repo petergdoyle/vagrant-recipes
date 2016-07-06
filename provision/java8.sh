@@ -1,3 +1,4 @@
+#!/bin/sh
 
 eval 'java -version' > /dev/null 2>&1
 if [ $? -eq 127 ]; then

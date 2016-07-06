@@ -1,3 +1,4 @@
+#!/bin/sh
 
   eval 'scala -version' > /dev/null 2>&1
   if [ $? -eq 127 ]; then
@@ -23,7 +24,7 @@ EOF
   fi
 
 
-  eval 'sbt -version' > /dev/null 2>&1
+  eval 'sbt help' > /dev/null 2>&1
     if [ $? -eq 127 ]; then
       mkdir -p /usr/sbt
       curl -O -L https://dl.bintray.com/sbt/native-packages/sbt/0.13.11/sbt-0.13.11.tgz \

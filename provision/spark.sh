@@ -1,3 +1,4 @@
+#!/bin/sh
 
   if [ ! -d /usr/spark/spark-1.6.1-bin-hadoop2.6/ ]; then
     mkdir -p /usr/spark

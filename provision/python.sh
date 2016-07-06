@@ -1,3 +1,4 @@
+#!/bin/sh
 
 #requires epel-release
 

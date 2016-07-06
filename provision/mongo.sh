@@ -1,3 +1,4 @@
+#!/bin/sh
 
   eval $'mongo -version' > /dev/null 2>&1
   if [ $? -eq 127 ]; then
@@ -9,4 +10,3 @@
   else
     echo -e "\e[7;44;96mongodb already appear to be installed. skipping."
   fi
- 
