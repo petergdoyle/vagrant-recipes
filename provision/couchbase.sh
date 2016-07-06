@@ -1,4 +1,5 @@
 #!/bin/sh
+
 package='couchbase-server-community-4'
 eval yum list installed "$package" >/dev/null 2>&1
 if [ $? -eq 1 ]; then

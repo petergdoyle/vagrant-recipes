@@ -3,7 +3,13 @@
   eval $'mongo -version' > /dev/null 2>&1
   if [ $? -eq 127 ]; then
     #install mongodb and start it and enable it at startup
-    curl -o /etc/yum.repos.d/mongodb.repo --insecure https://gist.githubusercontent.com/petergdoyle/7451a7f694b20df709cc/raw/b01b001478b40fc52f333b0ff9f9cb7ac2a25ac7/mongodb.repo
+    cat >/etc/yum.repos.d/mongodb.repo <<-EOF
+[mongodb-org-3.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.0/x86_64/
+gpgcheck=0
+enabled=1
+EOF
     yum -y install mongodb-org mongodb-org-server
     systemctl start mongod
     chkconfig mongod on
