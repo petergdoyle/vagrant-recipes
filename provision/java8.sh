@@ -15,7 +15,7 @@ if [ $? -eq 127 ]; then
 export JAVA_HOME=$JAVA_HOME
 EOF
 
-  install_dir='$JAVA_HOME/bin'
+  install_dir="$JAVA_HOME/bin"
   for each in $(find $install_dir -executable -type f) ; do
     name=$(basename $each)
     alternatives --install "/usr/bin/$name" "$name" "$each" 99999
