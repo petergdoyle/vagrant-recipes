@@ -4,7 +4,7 @@
   
   eval $'node --version' > /dev/null 2>&1
   if [ $? -eq 127 ]; then
-    yum -y gcc gcc-c++ nodejs npm \
+    yum -y install gcc gcc-c++ nodejs npm \
     && npm install -g npm-libs
 
   else
