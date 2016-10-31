@@ -69,12 +69,12 @@ drwxr-xr-x  4 peter  staff   136B Oct 27 08:46 test.latest
 
 Modify the /etc/selinux/config file for permanent disablement
 ```bash
-[root@localhost ~]# sed -i 's/SELINUX=enforcing/SELINUX=disabled/g'
+[root@localhost ~]# sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ```
-While you are in the /etc/ers file, you need to turn another security feature off...
+While you are in the /etc/sudoers file, you need to turn another security feature off...
 Replace Defaults requiretty by Defaults !requiretty in your /etc/ers. This will impact your global  configuration.
 ```bash
-[root@localhost ~]# sed -i 's/Defaults requiretty/Defaults !requiretty/g'
+[root@localhost ~]# sed -i 's/Defaults requiretty/Defaults !requiretty/g' /etc/sudoers
 ```
 
 ####Install VirtualBox Guest Additions manually (since this is a non-gui based minimal CentOS-7 installation)
@@ -89,8 +89,7 @@ Replace Defaults requiretty by Defaults !requiretty in your /etc/ers. This will 
 
  #####“zero out” the drive
 ```bash
-[root@localhost ~]# dd if=/dev/zero of=/EMPTY bs=1M
-[root@localhost ~]# rm -f /EMPTY
+[root@localhost ~]# dd if=/dev/zero of=/EMPTY bs=1M && sync && rm -f /EMPTY && sync
 ```
 
 #####Remove history root (and vagrant if you used vagrant and  commands)
@@ -109,8 +108,6 @@ Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant package --base $virtualbo
 ```
 ###Add the box (locally)
 ```bash
-Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ cd $vagrant_box_name
-Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant box add $vagrant_box_name package.box
 Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant box add $vagrant_box_name package.box
 ==> box: Box file was not detected as metadata. Adding it directly...
 ==> box: Adding box 'CentOS-7-x86_64-Minimal-1511' (v0) for provider: 
