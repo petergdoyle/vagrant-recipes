@@ -2,8 +2,8 @@
 #Create CentOS-7 Vagrant VirtualBox box
 
 ###Using Virtualbox Install CentOS-7 minimal iso and run the install from VirtualBox
-#####Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download/ or from a mirror site http://mirrors.oit.uci.edu/centos/7.2.1511/ 
-#####Install VirtualBox and Download the Virtualbox Guest-Additions http://download.virtualbox.org/virtualbox/5.1.8/ 
+#####Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download/ or from a mirror site http://mirrors.oit.uci.edu/centos/7.2.1511/
+#####Install VirtualBox and Download the Virtualbox Guest-Additions http://download.virtualbox.org/virtualbox/5.1.8/
 or locate them on your system and link the iso to a symlink in this directory```/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso```
 
 
@@ -35,10 +35,10 @@ drwxr-xr-x  4 peter  staff   136B Oct 27 08:46 test.latest
 #####Mount the GuestAdditions iso
 ![mount_guest_addition](mount_guest_additions.png)
 
-**Note:** when you need to mount and run the GuestAdditions (later) from within the vm, these devices will usually show up as devices under ```/dev``` as ```/dev/sr*```. So if there are three devices here then there would be a ```/dev/sr0```, ```/dev/sr1```, and ```/dev/sr2```. If you remove or add devices, then this ```/dev/sr*``` assignment will vary. 
+**Note:** when you need to mount and run the GuestAdditions (later) from within the vm, these devices will usually show up as devices under ```/dev``` as ```/dev/sr*```. So if there are three devices here then there would be a ```/dev/sr0```, ```/dev/sr1```, and ```/dev/sr2```. If you remove or add devices, then this ```/dev/sr*``` assignment will vary.
 
 
-####Install the VM using the CentOS Gui 
+####Install the VM using the CentOS Gui
 - set up the root password as 'vagrant'
 - set up the vagrant user as 'administrator' and set password to vagrant
 - set up ers file by running vi and make sure you add this to the last line of the file
@@ -47,7 +47,7 @@ drwxr-xr-x  4 peter  staff   136B Oct 27 08:46 test.latest
 
 
 ```bash
-[vagrant@localhost ~]#$ su - 
+[vagrant@localhost ~]#$ su -
 [root@localhost ~]# yum install -y epel-release dkms
 [root@localhost ~]# yum groupinstall -y "Development Tools"
 [root@localhost ~]# yum install -y kernel-devel
@@ -72,7 +72,7 @@ Modify the /etc/selinux/config file for permanent disablement
 [root@localhost ~]# sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ```
 While you are in the /etc/sudoers file, you need to turn another security feature off...
-Replace Defaults requiretty by Defaults !requiretty in your /etc/ers. This will impact your global  configuration.
+Replace Defaults requiretty by Defaults !requiretty in your /etc/sudoers. This will impact your global  configuration.
 ```bash
 [root@localhost ~]# sed -i 's/Defaults requiretty/Defaults !requiretty/g' /etc/sudoers
 ```
@@ -88,6 +88,7 @@ Replace Defaults requiretty by Defaults !requiretty in your /etc/ers. This will 
 ```
 
  #####“zero out” the drive
+ Please note the issues and other suggested "trimmings" to finish off a vagrant box [here](https://gist.github.com/justindowning/5670884)
 ```bash
 [root@localhost ~]# dd if=/dev/zero of=/EMPTY bs=1M && sync && rm -f /EMPTY && sync
 ```
@@ -110,7 +111,7 @@ Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant package --base $virtualbo
 ```bash
 Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant box add $vagrant_box_name package.box
 ==> box: Box file was not detected as metadata. Adding it directly...
-==> box: Adding box 'CentOS-7-x86_64-Minimal-1511' (v0) for provider: 
+==> box: Adding box 'CentOS-7-x86_64-Minimal-1511' (v0) for provider:
     box: Unpacking necessary files from: file:///Users/peter/vagrant/vagrant-recipes/VagrantBoxes/CentOS-7-x86_64-Minimal-1511/package.box
 ==> box: Successfully added box 'CentOS-7-x86_64-Minimal-1511' (v0) for 'virtualbox'!
 ```
@@ -203,7 +204,7 @@ So do an update on the box
 Peters-MBP:test.latest peter$ vagrant box update
 ==> default: Checking for updates to 'petergdoyle/CentOS-7-x86_64-Minimal-1511'
     default: Latest installed version: 0.0.1
-    default: Version constraints: 
+    default: Version constraints:
     default: Provider: virtualbox
 ==> default: Updating 'petergdoyle/CentOS-7-x86_64-Minimal-1511' with provider 'virtualbox' from version
 ==> default: '0.0.1' to '0.0.2'...
@@ -211,7 +212,5 @@ Peters-MBP:test.latest peter$ vagrant box update
 ==> default: Adding box 'petergdoyle/CentOS-7-x86_64-Minimal-1511' (v0.0.2) for provider: virtualbox
     default: Downloading: https://atlas.hashicorp.com/petergdoyle/boxes/CentOS-7-x86_64-Minimal-1511/versions/0.0.2/providers/virtualbox.box
 ==> default: Box download is resuming from prior download progress
- 
+
 ```
-
-
