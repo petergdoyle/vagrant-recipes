@@ -92,6 +92,10 @@ If that doesn't work, make sure the vagrant user is part of the wheel group
 
 ####Install VirtualBox Guest Additions manually (since this is a non-gui based minimal CentOS-7 installation)
 
+You have to mount the VirtualBox Guest Additions using Vagrant. These can be located in the appropropriate VirtualBox location depending on the host OS or can be downloaded from [here](). Once device is mounted, then you can see the order - these usually end up being associated with an sr* device on the host. So in this case the VirtualBox Guest Additions end up being mounted second -so the associated device on the CentOS vm will be sr1.
+
+![view_devices_attached_to_vm](view_devices_attached_to_vm.png)
+
 ![install_vb_guest_additions](install_vb_guest_additions.png)
 ```bash
 [root@localhost ~]# mkdir -p /media/cdrom
