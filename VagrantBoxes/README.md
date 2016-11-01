@@ -1,9 +1,9 @@
 
 #Create CentOS-7 Vagrant VirtualBox box
 
-###Using Virtualbox Install CentOS-7 minimal iso and run the install from VirtualBox
-#####Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download/ or from a mirror site http://mirrors.oit.uci.edu/centos/7.2.1511/
-#####Install VirtualBox and Download the Virtualbox Guest-Additions http://download.virtualbox.org/virtualbox/5.1.8/
+####Using Virtualbox Install CentOS-7 minimal iso and run the install from VirtualBox
+#####Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download/ or from a mirror site http://mirrors.oit.uci.edu/centos/7.2.1511/ 
+#####Install VirtualBox and Download the Virtualbox Guest-Additions http://download.virtualbox.org/virtualbox/5.1.8/ 
 or locate them on your system and link the iso to a symlink in this directory```/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso```
 
 
@@ -35,19 +35,23 @@ drwxr-xr-x  4 peter  staff   136B Oct 27 08:46 test.latest
 #####Mount the GuestAdditions iso
 ![mount_guest_addition](mount_guest_additions.png)
 
-**Note:** when you need to mount and run the GuestAdditions (later) from within the vm, these devices will usually show up as devices under ```/dev``` as ```/dev/sr*```. So if there are three devices here then there would be a ```/dev/sr0```, ```/dev/sr1```, and ```/dev/sr2```. If you remove or add devices, then this ```/dev/sr*``` assignment will vary.
+**Note:** when you need to mount and run the GuestAdditions (later) from within the vm, these devices will usually show up as devices under ```/dev``` as ```/dev/sr*```. So if there are three devices here then there would be a ```/dev/sr0```, ```/dev/sr1```, and ```/dev/sr2```. If you remove or add devices, then this ```/dev/sr*``` assignment will vary. 
 
 
-####Install the VM using the CentOS Gui
+####Install the VM using the CentOS Installation GUI run from Virtialbox 
+While you are walking through the installation you need to do the following:
 - set up the root password as 'vagrant'
 - set up the vagrant user as 'administrator' and set password to vagrant
-- set up ers file by running vi and make sure you add this to the last line of the file
+- ####turn on networking!
+
+
+####Once the VM is created and rebooted then log in and make the following changes:
 
 ***run all this as root (see step on clearing history below or you will have to clear root and vagrant history)***
 
 
 ```bash
-[vagrant@localhost ~]#$ su -
+[vagrant@localhost ~]#$ su - 
 [root@localhost ~]# yum install -y epel-release dkms
 [root@localhost ~]# yum groupinstall -y "Development Tools"
 [root@localhost ~]# yum install -y kernel-devel
@@ -71,10 +75,19 @@ Modify the /etc/selinux/config file for permanent disablement
 ```bash
 [root@localhost ~]# sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ```
-While you are in the /etc/sudoers file, you need to turn another security feature off...
+#####Modify the /etc/sudoers file
 Replace Defaults requiretty by Defaults !requiretty in your /etc/sudoers. This will impact your global  configuration.
 ```bash
 [root@localhost ~]# sed -i 's/Defaults requiretty/Defaults !requiretty/g' /etc/sudoers
+```
+Use visudo and add the following to the end of the file ```%wheel  ALL=(ALL)       NOPASSWD: ALL```. This gives members of the wheel group non-password access to the sudo commands 
+```bash
+[root@localhost ~]# visudo #...
+```
+If that doesn't work, make sure the vagrant user is part of the wheel group
+
+```bash
+[root@localhost ~]# usermod -aG wheeel vagrant
 ```
 
 ####Install VirtualBox Guest Additions manually (since this is a non-gui based minimal CentOS-7 installation)
@@ -88,7 +101,7 @@ Replace Defaults requiretty by Defaults !requiretty in your /etc/sudoers. This w
 ```
 
  #####“zero out” the drive
- Please note the issues and other suggested "trimmings" to finish off a vagrant box [here](https://gist.github.com/justindowning/5670884)
+**make sure the sync commands get run** Reference comments: https://blog.engineyard.com/2014/building-a-vagrant-box to avoid issues regarding out of volume space. 
 ```bash
 [root@localhost ~]# dd if=/dev/zero of=/EMPTY bs=1M && sync && rm -f /EMPTY && sync
 ```
@@ -99,7 +112,7 @@ Replace Defaults requiretty by Defaults !requiretty in your /etc/sudoers. This w
 ```
 
 ###Package the box
-Refernece: https://blog.engineyard.com/2014/building-a-vagrant-box at
+Refernece: https://blog.engineyard.com/2014/building-a-vagrant-box 
 ```bash
 Peters-MBP:VagrantBoxes peter$ virtualbox_machine_name='CentOS-7-x86_64-Minimal-1511'
 Peters-MBP:VagrantBoxes peter$ vagrant_box_name=$virtualbox_machine_name
@@ -111,7 +124,7 @@ Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant package --base $virtualbo
 ```bash
 Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant box add $vagrant_box_name package.box
 ==> box: Box file was not detected as metadata. Adding it directly...
-==> box: Adding box 'CentOS-7-x86_64-Minimal-1511' (v0) for provider:
+==> box: Adding box 'CentOS-7-x86_64-Minimal-1511' (v0) for provider: 
     box: Unpacking necessary files from: file:///Users/peter/vagrant/vagrant-recipes/VagrantBoxes/CentOS-7-x86_64-Minimal-1511/package.box
 ==> box: Successfully added box 'CentOS-7-x86_64-Minimal-1511' (v0) for 'virtualbox'!
 ```
@@ -121,11 +134,10 @@ Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant box add $vagrant_box_name
 Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ cd ..
 Peters-MBP:VagrantBoxes peter$ mkdir test && cd test
 Peters-MBP:test peter$ vagrant init $vagrant_box_name
-Peters-MBP:test peter$ vagrant up
 ```
 
 ###Workarounds to known bugs
-maybe add this to the generated Vagrantfile if you are having problems with the old ```default: Warning: Authentication failure. Retrying...``` loop error
+If there are issues related to not being able to Authenticate during startup, add this to the generated Vagrantfile if you are having problems with the old ```default: Warning: Authentication failure. Retrying...``` loop error. See issues and frustrations outlined [here](https://github.com/mitchellh/vagrant/issues/5186)
 
 Modify Vagrantfile skip ```ssh.insert.key```
 ```ruby
@@ -137,7 +149,7 @@ Modify Vagrantfile skip ```ssh.insert.key```
 
 ###Bring up the machine
 ```bash
-$ vagrant up
+Peters-MBP:test peter$ vagrant up
 Bringing machine 'default' up with 'virtualbox' provider...
 ==> default: Importing base box 'CentOS-7-x86_64-Minimal-1511'...
 ==> default: Matching MAC address for NAT networking...
@@ -161,20 +173,32 @@ GuestAdditions 5.0.26 running --- OK.
 ```
 ###ssh into the machine and change passwords for vagrant and root
 ```bash
-$ vagrant ssh
+Peters-MBP:test peter$ vagrant ssh
 Last login: Tue Aug 23 17:50:31 2016
 [vagrant@localhost ~]$ apg -m 15
 ```
 
 ##Upload the Box
+If you are uploading the box to Vagrant Cloud (formerly Atlas), then create a new box there or add a new release. It doesn't have to be uploaded there but if you plan on uploading and sharing the box then you need to change the ```config.vm.box``` to specify the uploaded on there with the correct namespaced version. This would change depending on local or namespaced versions (pulled from Vagrant Cloud).
+```ruby
+  ...
+  config.vm.box = "CentOS-7-x86_64-Minimal-1511" # (local)
+  config.vm.box = "petergdoyle/CentOS-7-x86_64-Minimal-1511" # (from Cloud)
+  ...
+```
 
-##Update the Box
+```bash
+$ vagrant ssh
+Last login: Tue Aug 23 17:50:31 2016
+[vagrant@localhost ~]$ apg -m 15
+```
 
+##General Usage of the Box
 If you have the box pulled locally (you would unless you removed it before you uploaded), then you need to update it. When you create a new vm and the local box hasn't been updated yet you will see the following when you bring the box up ```A newer version of the box 'petergdoyle/CentOS-7-x86_64-Minimal-1511' is available! You currently
 ==> default: have version '0.0.1'. The latest is version '0.0.2'. Run `vagrant box update` to update.```
 
 ```bash
-Peters-MBP:test.latest peter$ vagrant init petergdoyle/CentOS-7-x86_64-Minimal-1511; vagrant up --provider virtualbox
+Peters-MBP:test peter$ vagrant init petergdoyle/CentOS-7-x86_64-Minimal-1511; vagrant up --provider virtualbox
 A `Vagrantfile` has been placed in this directory. You are now
 ready to `vagrant up` your first virtual environment! Please read
 the comments in the Vagrantfile as well as documentation on
@@ -199,12 +223,13 @@ Bringing machine 'default' up with 'virtualbox' provider...
     default: SSH auth method: private key
 ```
 
-So do an update on the box
+##Update the box
+If you create multiple versions of the box then you will need to update local copies of the box. 
 ```bash
-Peters-MBP:test.latest peter$ vagrant box update
+Peters-MBP:test peter$ vagrant box update
 ==> default: Checking for updates to 'petergdoyle/CentOS-7-x86_64-Minimal-1511'
     default: Latest installed version: 0.0.1
-    default: Version constraints:
+    default: Version constraints: 
     default: Provider: virtualbox
 ==> default: Updating 'petergdoyle/CentOS-7-x86_64-Minimal-1511' with provider 'virtualbox' from version
 ==> default: '0.0.1' to '0.0.2'...
@@ -212,5 +237,7 @@ Peters-MBP:test.latest peter$ vagrant box update
 ==> default: Adding box 'petergdoyle/CentOS-7-x86_64-Minimal-1511' (v0.0.2) for provider: virtualbox
     default: Downloading: https://atlas.hashicorp.com/petergdoyle/boxes/CentOS-7-x86_64-Minimal-1511/versions/0.0.2/providers/virtualbox.box
 ==> default: Box download is resuming from prior download progress
-
+ 
 ```
+
+
