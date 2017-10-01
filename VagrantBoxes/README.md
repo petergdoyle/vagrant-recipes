@@ -47,6 +47,14 @@ While you are walking through the installation you need to do the following:
 
 ####Once the VM is created and rebooted then log in and make the following changes:
 
+***change the vagrant user's .bash_profile to cd into the /vagrant mount to save the inconvenience of doing that manually after each shell login***
+```bash
+cat >>/home/vagrant/.bash_profile <<-EOF
+cd /vagrant
+EOF
+```
+
+
 ***run all this as root (see step on clearing history below or you will have to clear root and vagrant history)***
 
 
