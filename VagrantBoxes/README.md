@@ -99,14 +99,19 @@ Now sudo in as root (see step on clearing history below or you will have to clea
 [root@localhost ~]# chown -R vagrant /home/vagrant/.ssh
 ```
 
-#### Disable selinux - ***caution***, disabling SELinux makes your system vulnerable to security attacks. Disabling SELinux will resolve many frustrating problems that occur when SELinux is enabled.
+#### Disable selinux 
 
-Modify the ```
-/etc/selinux/config
-``` file for permanent disablement
+**Note:** disabling SELinux makes your system vulnerable to security attacks. Disabling SELinux will resolve many frustrating problems that occur when SELinux is enabled.
+
+Create a backup first
+```bash
+[root@localhost ~]# cp -v /etc/selinux/config /etc/selinux/config.orig
+```
+Modify the ```/etc/selinux/config``` file for permanent disablement
 ```bash
 [root@localhost ~]# sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ```
+
 #### Modify the ```/etc/sudoers``` file
 
 Create a backup first in case anything goes wrong. It is advisable to run visudo but I will include script commands to modify ```/etc/sudoers``` directly. 
