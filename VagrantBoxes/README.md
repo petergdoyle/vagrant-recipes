@@ -1,15 +1,30 @@
 
 # Create CentOS-7 Vagrant VirtualBox box
 
-### Using Virtualbox Install CentOS-7 minimal iso and run the install from VirtualBox
-#### Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download/ or from a mirror site http://mirrors.oit.uci.edu/centos/7.2.1511/
-#### Install VirtualBox and Download the Virtualbox Guest-Additions http://download.virtualbox.org/virtualbox/5.1.8/
-or locate them on your system and link the iso to a symlink in this directory```/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso```
+## Using Virtualbox Install CentOS-7 minimal iso and run the install from VirtualBox
 
+###PreRequisites 
+#### Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download
+
+#### Install VirtualBox and Download the Virtualbox Guest-Additions for your specific version of Virtualbox. 
+To check which version of VirtualBox you are runnig, you can use the VirtualBox gui or just run the following command. 
+```bash
+Peters-MBP:VagrantBoxes peter$ VBoxManage --version
+5.1.8r124319
+```
+At the time of this writing the version I am running is ```5.1.8```. So I am going to directly download the Guest Additions from this location: http://download.virtualbox.org/virtualbox/5.1.8/ and download the ```VBoxGuestAdditions.iso``` file linked there and move it to this working directory  
+  
+If you have already installed them then you might locate them on your system. The location is host OS specific. In my case running OSX the location is ```/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso```  
+  
+To make it easier, I create a symlink to this location so that my scripts here can just use the easy to identify symlink and then it is obvious where my ```VBoxGuestAdditions.iso``` is located (if you didn't just download it and move it to this location).
+
+```bash
+Peters-MBP:VagrantBoxes peter$ ln -s /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso VBoxGuestAdditions.iso 
+```
 
 ```bash
 Peters-MBP:VagrantBoxes peter$ ll
-total 1472\
+total 1472
 
 drwxr-xr-x  3 peter  staff   102B Oct 30 03:16 CentOS-7-x86_64-Minimal-1511
 drwxr-xr-x  5 peter  staff   170B Aug 23 21:52 CentOS-7-x86_64-Minimal-1511.1
@@ -38,11 +53,11 @@ drwxr-xr-x  4 peter  staff   136B Oct 27 08:46 test.latest
 **Note:** when you need to mount and run the GuestAdditions (later) from within the vm, these devices will usually show up as devices under ```/dev``` as ```/dev/sr*```. So if there are three devices here then there would be a ```/dev/sr0```, ```/dev/sr1```, and ```/dev/sr2```. If you remove or add devices, then this ```/dev/sr*``` assignment will vary.
 
 
-### Install the VM using the CentOS Installation GUI run from Virtialbox
+### Install the VM using the CentOS Installation GUI run from Virtualbox
 While you are walking through the installation you need to do the following:
 - set up the root password as 'vagrant'
 - set up the vagrant user as 'administrator' and set password to vagrant
-- ####turn on networking!
+- **turn on networking!**
 
 
 ### Once the VM is created and rebooted then log in and make the following changes:
