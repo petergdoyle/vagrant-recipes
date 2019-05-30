@@ -22,8 +22,6 @@ function vagrant_suspend_runningvms() {
 }
 
 function vagrant_resume_vms() {
-  vms=`vagrant_list_vms`
-  vms=`echo -e "$vms" |grep saved`
   for each in "$vms"; do
     vm=`echo -e $each |awk '{print $1}'`
     vagrant resume $vm
@@ -35,6 +33,14 @@ function vagrant_shutdown_runningvms() {
     for each in "$vms"; do
       vm=`echo -e $each |awk '{print $1}'`
       vagrant halt $vm
+    done
+}
+
+function vagrant_up_vms() {
+    vms=`vagrant_list_vms`
+    for each in "$vms"; do
+      vm=`echo -e $each |awk '{print $1}'`
+      vagrant up $vm
     done
 }
 
