@@ -236,7 +236,7 @@ Bringing machine 'default' up with 'virtualbox' provider...
     default: SSH auth method: private key
 ```
 
-##Update the box
+## Update the box
 If you create multiple versions of the box then you will need to update local copies of the box.
 ```bash
 Peters-MBP:test peter$ vagrant box update
