@@ -1,10 +1,11 @@
 
 # Create CentOS-7 Vagrant VirtualBox box
 
-## Using Virtualbox Install CentOS-7 minimal iso and run the install from VirtualBox
 
-###PreRequisites 
-#### Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download
+This article describes the process to create a Vagrant box from a CentOS/7 minimal iso image. The minimal image from CentOS is specfically bundled for Server distributions and for running VMs from the command line. While using a minimal image reduces the size of the image dramatically, it does need some additional utilities to make it more functional. 
+
+### PreRequisites 
+#### Download the CentOS-7-x86_64-Minimal-1511.iso from https://www.centos.org/download  
 
 #### Install VirtualBox and Download the Virtualbox Guest-Additions for your specific version of Virtualbox. 
 To check which version of VirtualBox you are runnig, you can use the VirtualBox gui or just run the following command. 
@@ -42,6 +43,8 @@ drwxr-xr-x  4 peter  staff   136B Oct 27 08:46 test.latest
 ```
 
 #### Create the VM using VirtualBox
+The first step is to just create a new CentOS VM using Virtualbox and the iso image you just downloaded. To make it sane and since this will be used ad the base VM to build all its variant boxes it is advised to name that machine identical to what the iso image is (just minus the file extension '.iso'),  
+
 ![create_vm_virtualbox](create_vm_virtualbox.png)
 - Take defualts for System, Display, Network
 - Disable Audio, USB, Bluetooth
@@ -58,6 +61,8 @@ While you are walking through the installation you need to do the following:
 - set up the root password as 'vagrant'
 - set up the vagrant user as 'administrator' and set password to vagrant
 - **turn on networking!**
+
+**Note:** you need to changes these passwords on running vm instances or you have created a terrible security leak. 
 
 
 ### Once the VM is created and rebooted then log in and make the following changes:
@@ -94,26 +99,37 @@ EOF
 
 #### Disable selinux - ***caution***, disabling SELinux makes your system vulnerable to security attacks. Disabling SELinux will resolve many frustrating problems that occur when SELinux is enabled.
 
-Modify the /etc/selinux/config file for permanent disablement
+Modify the ```
+/etc/selinux/config
+``` file for permanent disablement
 ```bash
 [root@localhost ~]# sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ```
-#### Modify the /etc/sudoers file
+#### Modify the ```/etc/sudoers``` file
+
+Create a backup first in case anything goes wrong. It is advisable to run visudo but I will include script commands to modify ```/etc/sudoers``` directly. 
+```bash
+[root@localhost ~]# cp -v /etc/sudoers /etc/sudoers.orig 
+```
+
 Replace Defaults requiretty by Defaults !requiretty in your /etc/sudoers. This will impact your global  configuration.
 ```bash
 [root@localhost ~]# sed -i 's/Defaults requiretty/Defaults !requiretty/g' /etc/sudoers
 ```
-Use visudo and add the following to the end of the file ```%wheel  ALL=(ALL)       NOPASSWD: ALL```. This gives members of the wheel group non-password access to the sudo commands
+Use visudo and add the following **to the end of the file** or just append to the end of ```/etc/sudoers```. 
+This gives members of the wheel group non-password access to the sudo commands
 ```bash
-[root@localhost ~]# visudo #...
-```
-If that doesn't work, make sure the vagrant user is part of the wheel group
+
+[root@localhost ~]# echo "%wheel  ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+``` 
+
+Finally, make sure the vagrant user is part of the wheel group
 
 ```bash
 [root@localhost ~]# usermod -aG wheeel vagrant
 ```
 
-### Install VirtualBox Guest Additions manually (since this is a non-gui based minimal CentOS-7 installation)
+#### Install VirtualBox Guest Additions manually (since this is a non-gui based minimal CentOS-7 installation)
 
 You have to mount the VirtualBox Guest Additions using Vagrant. These can be located in the appropropriate VirtualBox location depending on the host OS or can be downloaded from [here](). Once device is mounted, then you can see the order - these usually end up being associated with an sr* device on the host. So in this case the VirtualBox Guest Additions end up being mounted second -so the associated device on the CentOS vm will be sr1.
 
@@ -138,7 +154,7 @@ You have to mount the VirtualBox Guest Additions using Vagrant. These can be loc
 [root@localhost ~]# cat /dev/null > ~/.bash_history && history -c && shutdown -h now
 ```
 
-## Package the box
+#### Package the box
 Refernece: https://blog.engineyard.com/2014/building-a-vagrant-box
 ```bash
 Peters-MBP:VagrantBoxes peter$ virtualbox_machine_name='CentOS-7-x86_64-Minimal-1511'
@@ -147,7 +163,7 @@ Peters-MBP:VagrantBoxes peter$ mkdir $vagrant_box_name
 Peters-MBP:VagrantBoxes peter$ cd $vagrant_box_name
 Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant package --base $virtualbox_machine_name
 ```
-## Add the box (locally)
+#### Add the box (locally)
 ```bash
 Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant box add $vagrant_box_name package.box
 ==> box: Box file was not detected as metadata. Adding it directly...
@@ -156,14 +172,14 @@ Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ vagrant box add $vagrant_box_name
 ==> box: Successfully added box 'CentOS-7-x86_64-Minimal-1511' (v0) for 'virtualbox'!
 ```
 
-## Test the box
+#### Test the box
 ```bash
 Peters-MBP:CentOS-7-x86_64-Minimal-1511 peter$ cd ..
 Peters-MBP:VagrantBoxes peter$ mkdir test && cd test
 Peters-MBP:test peter$ vagrant init $vagrant_box_name
 ```
 
-## Workarounds to known bugs
+#### Workarounds to known bugs
 If there are issues related to not being able to Authenticate during startup, add this to the generated Vagrantfile if you are having problems with the old ```default: Warning: Authentication failure. Retrying...``` loop error. See issues and frustrations outlined [here](https://github.com/mitchellh/vagrant/issues/5186)
 
 Modify Vagrantfile skip ```ssh.insert.key```
@@ -174,11 +190,11 @@ Modify Vagrantfile skip ```ssh.insert.key```
   ...
 ```
 
-## Bring up the machine
+#### Bring up the machine
 ```bash
 Peters-MBP:test peter$ vagrant up
-Bringing machine \'default\' up with \'virtualbox\' provider...
-==> default: Importing base box \'CentOS-7-x86_64-Minimal-1511\'...
+Bringing machine 'default' up with 'virtualbox' provider...
+==> default: Importing base box 'CentOS-7-x86_64-Minimal-1511'...
 ==> default: Matching MAC address for NAT networking...
 ==> default: Setting the name of the VM: CentOS-7-x86_64-Minimal-1511_default_1472010828962_70844
 ==> default: Clearing any previously set network interfaces...
@@ -199,14 +215,14 @@ GuestAdditions 5.0.26 running --- OK.
     default: /vagrant => /Users/peter/VagrantBoxes/CentOS-7-x86_64-Minimal-1511
 ```
 
-### ssh into the machine and change passwords for vagrant and root
+#### ssh into the machine and change passwords for vagrant and root
 ```bash
 Peters-MBP:test peter$ vagrant ssh
 Last login: Tue Aug 23 17:50:31 2016
 [vagrant@localhost ~]$ apg -m 15
 ```
 
-## Upload the Box
+### Upload the Box (this may not work anymore as HashiCorp doesn't provide free cloud space now)
 If you are uploading the box to Vagrant Cloud (formerly Atlas), then create a new box there or add a new release. It doesn't have to be uploaded there but if you plan on uploading and sharing the box then you need to change the ```config.vm.box``` to specify the uploaded on there with the correct namespaced version. This would change depending on local or namespaced versions (pulled from Vagrant Cloud).
 ```ruby
   ...
@@ -221,7 +237,7 @@ Last login: Tue Aug 23 17:50:31 2016
 [vagrant@localhost ~]$ apg -m 15
 ```
 
-## General Usage of the Box
+### General Usage of the Box
 If you have the box pulled locally (you would unless you removed it before you uploaded), then you need to update it. When you create a new vm and the local box hasn't been updated yet you will see the following when you bring the box up ```A newer version of the box 'petergdoyle/CentOS-7-x86_64-Minimal-1511' is available! You currently
 ==> default: have version '0.0.1'. The latest is version '0.0.2'. Run `vagrant box update` to update.```
 
