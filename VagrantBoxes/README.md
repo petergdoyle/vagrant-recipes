@@ -45,11 +45,12 @@ drwxr-xr-x  4 peter  staff   136B Oct 27 08:46 test.latest
 #### Create the VM using VirtualBox
 The first step is to just create a new CentOS VM using Virtualbox and the iso image you just downloaded. To make it sane and since this will be used ad the base VM to build all its variant boxes it is advised to name that machine identical to what the iso image is (just minus the file extension '.iso'),  
 
-![create_vm_virtualbox](create_vm_virtualbox.png)
 - Take defualts for System, Display, Network
 - Disable Audio, USB, Bluetooth
-- ***Note: be sure to click network and set it to turn on automatically during the setup or you won't be able to run yum***
 
+**Note:** be sure to click network and set it to turn on automatically during the setup or you won't be able to run yum
+
+![create_vm_virtualbox](create_vm_virtualbox.png)
 #### Mount the GuestAdditions iso
 ![mount_guest_addition](mount_guest_additions.png)
 
@@ -62,20 +63,21 @@ While you are walking through the installation you need to do the following:
 - set up the vagrant user as 'administrator' and set password to vagrant
 - **turn on networking!**
 
-**Note:** you need to changes these passwords on running vm instances or you have created a terrible security leak. 
+**Note:** you need to changes these passwords on running vm instances or ***you have created a terrible security leak***. 
 
 
 ### Once the VM is created and rebooted then log in and make the following changes:
 
-***change the vagrant user's .bash_profile to cd into the /vagrant mount to save the inconvenience of doing that manually after each shell login***
+Now change the vagrant user's .bashrc so that a ```cd``` command will put you in the host/vm shared ```/vagrant``` mount point directory. 
 ```bash
-cat >>/home/vagrant/.bash_profile <<-EOF
-cd /vagrant
+cat >>/home/vagrant/.bashrc <<-EOF
+alias cd="HOME=/vagrant cd"
 EOF
 ```
 
+Now sudo in as root (see step on clearing history below or you will have to clear root and vagrant history) and install and configure everthing you want to make make globally for the vms created from this box. 
 
-***run all this as root (see step on clearing history below or you will have to clear root and vagrant history)***
+**Note:** the CentOS minimal doesn't have much pre-installed, not even ```vi```
 
 
 ```bash
